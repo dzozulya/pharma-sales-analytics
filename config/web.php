@@ -2,6 +2,7 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$dbComponents = require __DIR__ . '/db-components.php';
 
 $config = [
     'id' => 'basic',
@@ -11,7 +12,7 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
-    'components' => [
+    'components' =>array_merge($dbComponents, [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'yqLXtP6wUQiPh0e9RBYEor77_TVx_5gA',
@@ -26,12 +27,7 @@ $config = [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
-            'viewPath' => '@app/mail',
-            // send all mails to a file by default.
-            'useFileTransport' => true,
-        ],
+
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets' => [
@@ -50,7 +46,7 @@ $config = [
             ],
         ],
         */
-    ],
+    ]),
     'params' => $params,
 ];
 

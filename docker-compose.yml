@@ -1,0 +1,51 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    container_name: pharma-app
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      MONGODB_DSN: mongodb://mongodb:27017/datamind_test
+      ELASTIC_URL: http://opensearch:9200
+    depends_on:
+      - mongodb
+      - opensearch
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: pharma-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/app
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+
+  mongodb:
+    image: mongo:7
+    container_name: pharma-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+  opensearch:
+    image: opensearchproject/opensearch:2
+    container_name: pharma-opensearch
+    environment:
+      discovery.type: single-node
+      plugins.security.disabled: "true"
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: "TestPassword123!"
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - opensearch-data:/usr/share/opensearch/data
+
+volumes:
+  mongo-data:
+  opensearch-data:

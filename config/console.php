@@ -2,6 +2,7 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$dbComponents = require __DIR__ . '/db-components.php';
 
 $config = [
     'id' => 'basic-console',
@@ -13,7 +14,7 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
         '@tests' => '@app/tests',
     ],
-    'components' => [
+    'components' => array_merge($dbComponents, [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -26,7 +27,7 @@ $config = [
             ],
         ],
         'db' => $db,
-    ],
+    ]),
     'params' => $params,
     /*
     'controllerMap' => [
