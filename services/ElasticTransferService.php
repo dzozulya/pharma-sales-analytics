@@ -13,7 +13,7 @@ final class ElasticTransferService
     private const INDEX = 'badm_sales';
 
     public function __construct(
-        private readonly CsvRowNormalizer $normalizer = new CsvRowNormalizer(),
+        private readonly CsvRowNormalizer $normalizer,
     ) {
     }
 
