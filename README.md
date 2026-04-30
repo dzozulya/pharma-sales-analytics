@@ -277,7 +277,7 @@ http://localhost:8080/index.php?r=sales-import%2Findex
 {
   "processed": 3540,
   "inserted": 0,
-  "updated": 3540
+  "skipped": 3540
 }
 ```
 
@@ -357,12 +357,6 @@ http://localhost:8080/index.php?r=sales-report%2Findex
 ## Консольні команди
 
 Імпорт CSV у MongoDB:
-
-```bash
-docker compose exec app php yii data-import/mongo @app/storage/imports/badm.csv
-```
-
-Якщо в `DataImportController` заданий шлях за замовчуванням, можна запускати так:
 
 ```bash
 docker compose exec app php yii data-import/mongo

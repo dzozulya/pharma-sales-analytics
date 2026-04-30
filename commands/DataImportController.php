@@ -29,9 +29,10 @@ final class DataImportController extends Controller
         $result = $this->mongoImportService->import($filePath);
 
         $this->stdout("Mongo import completed\n");
+        $this->stdout("File: {$filePath}\n");
         $this->stdout("Processed: {$result['processed']}\n");
         $this->stdout("Inserted: {$result['inserted']}\n");
-        $this->stdout("Updated: {$result['updated']}\n");
+        $this->stdout("Skipped: {$result['skipped']}\n");
 
         return ExitCode::OK;
     }
