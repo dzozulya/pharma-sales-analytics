@@ -42,8 +42,7 @@ final class CsvRowNormalizer
         $normalized['row_number'] = $rowNumber;
         $normalized['file_hash'] = $fileHash;
         $normalized['import_key'] = $this->buildImportKey($fileHash, $rowNumber);
-        $normalized['quantity'] = $this->toInt($row[self::COL_QTY] ?? 0);
-        $normalized['created_at'] = new \MongoDB\BSON\UTCDateTime();
+        $normalized['quantity'] = $this->toInt($normalized[self::COL_QTY] ?? 0);
         $normalized['updated_at'] = new \MongoDB\BSON\UTCDateTime();
 
         return $normalized;

@@ -52,7 +52,7 @@ final class MongoImportService
 
         $processed = 0;
         $inserted = 0;
-        $updated = 0;
+        $skipped = 0;
         $rowNumber = 1;
 
         while (($csvRow = fgetcsv($handle, 0, ',')) !== false) {
@@ -70,30 +70,25 @@ final class MongoImportService
             }
 
             $document = $this->normalizer->normalizeForMongo($row, $rowNumber, $fileHash);
-            $importKey = $document['import_key'];
-
-            unset($document['created_at']);
-
+            $document['created_at'] = new \MongoDB\BSON\UTCDateTime();
             $document['updated_at'] = new \MongoDB\BSON\UTCDateTime();
 
-            $result = $collection->update(
-                ['import_key' => $importKey],
-                [
-                    '$set' => $document,
-                    '$setOnInsert' => [
-                        'created_at' => new \MongoDB\BSON\UTCDateTime(),
-                    ],
-                ],
-                ['upsert' => true]
-            );
+            try {
+                $collection->insert($document);
+                $inserted++;
+            } catch (\Throwable $exception) {
+                if ($this->isDuplicateKeyException($exception)) {
+                    $skipped++;
+                    $processed++;
+                    continue;
+                }
+
+                throw $exception;
+            }
+
+
 
             $processed++;
-
-            if (($result['upserted'] ?? null) !== null || (int)($result['n'] ?? 0) === 0) {
-                $inserted++;
-            } else {
-                $updated++;
-            }
         }
 
         fclose($handle);
@@ -101,7 +96,7 @@ final class MongoImportService
         return [
             'processed' => $processed,
             'inserted' => $inserted,
-            'updated' => $updated,
+            'skipped' => $skipped,
         ];
     }
 
@@ -111,5 +106,17 @@ final class MongoImportService
         $mongodb = Yii::$app->mongodb;
 
         return $mongodb;
+    }
+    private function isDuplicateKeyException(\Throwable $exception): bool
+    {
+        if ((int)$exception->getCode() === 11000) {
+            return true;
+        }
+
+        $message = $exception->getMessage();
+
+        return str_contains($message, 'E11000')
+            || str_contains($message, 'duplicate key')
+            || str_contains($message, 'dup key');
     }
 }
