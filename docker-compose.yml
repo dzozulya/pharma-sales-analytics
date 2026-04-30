@@ -11,7 +11,6 @@ services:
       - ./docker/php/entrypoint.sh:/usr/local/bin/app-entrypoint
     entrypoint: ["sh", "/usr/local/bin/app-entrypoint"]
     command: [ "php-fpm" ]
-    user: "${UID:-1000}:${GID:-1000}"
     environment:
       MONGODB_DSN: mongodb://mongodb:27017/datamind_test
       ELASTIC_URL: http://opensearch:9200
