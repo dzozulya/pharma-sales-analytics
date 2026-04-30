@@ -24,7 +24,7 @@ final class SalesReportController extends Controller
     {
         $searchModel = new SalesReportSearch();
 
-        $searchModel->load(Yii::$app->request->get());
+        $searchModel->setAttributes(Yii::$app->request->get(), false);
         $searchModel->validate();
 
         $rows = $this->salesReportService->getRegionProductQuantityReport(

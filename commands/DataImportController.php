@@ -22,7 +22,7 @@ final class DataImportController extends Controller
     ) {
         parent::__construct($id, $module, $config);
     }
-    public function actionMongo(string $filePath): int
+    public function actionMongo(string $filePath = '@app/storage/imports/badm.csv'): int
     {
         $filePath = \Yii::getAlias($filePath);
 

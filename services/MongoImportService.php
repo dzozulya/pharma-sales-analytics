@@ -72,6 +72,8 @@ final class MongoImportService
             $document = $this->normalizer->normalizeForMongo($row, $rowNumber, $fileHash);
             $importKey = $document['import_key'];
 
+            unset($document['created_at']);
+
             $document['updated_at'] = new \MongoDB\BSON\UTCDateTime();
 
             $result = $collection->update(

@@ -20,7 +20,8 @@
         "yiisoft/yii2-mongodb": "^3.0",
         "yiisoft/yii2-httpclient": "^2.0",
         "symfony/mailer": "^7.3",
-        "symfony/mime": "^7.3"
+        "symfony/mime": "^7.3",
+      "ext-mongodb": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

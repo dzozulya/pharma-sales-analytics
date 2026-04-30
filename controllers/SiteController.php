@@ -57,11 +57,11 @@ class SiteController extends Controller
     /**
      * Displays homepage.
      *
-     * @return string
+
      */
-    public function actionIndex()
+    public function actionIndex() : Response
     {
-        return $this->render('index');
+        return $this->redirect(['/sales-import/index']);
     }
 
     /**

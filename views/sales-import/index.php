@@ -9,9 +9,10 @@ use yii\widgets\ActiveForm;
 
 $this->title = 'Sales data import';
 
-$this->registerJsFile('@web/js/sales-import.js', [
+$this->registerJsFile('/js/sales-import.js', [
     'depends' => [
         \yii\web\JqueryAsset::class,
+        \yii\web\YiiAsset::class,
     ],
 ]);
 
@@ -64,11 +65,16 @@ $this->registerJsVar('salesImportConfig', [
                     'disabled' => true,
                 ]) ?>
 
-                <?= Html::a('Open report', ['sales-report/index'], [
-                    'class' => 'btn btn-default',
-                    'id' => 'report-button',
-                    'style' => 'display: none;',
-                ]) ?>
+                <?= Html::a(
+                        '<span class="glyphicon glyphicon-stats"></span> Open report',
+                        ['sales-report/index'],
+                        [
+                                'class' => 'btn btn-info btn-lg report-button',
+                                'id' => 'report-button',
+                                'style' => 'display: none;',
+                                'encode' => false,
+                        ]
+                ) ?>
             </div>
 
             <?php ActiveForm::end(); ?>
@@ -118,5 +124,17 @@ $this->registerJsVar('salesImportConfig', [
         background: #f8f8f8;
         border: 1px solid #ddd;
         padding: 12px;
+    }
+
+    .report-button {
+        margin-left: 10px;
+        padding: 10px 22px;
+        font-weight: 600;
+        border-radius: 4px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+    }
+
+    .report-button .glyphicon {
+        margin-right: 6px;
     }
 </style>

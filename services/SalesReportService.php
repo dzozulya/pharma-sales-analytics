@@ -18,18 +18,18 @@ final class SalesReportService
     ): array {
         $filters = [];
 
-        if ($region !== null && $region !== '') {
+        if ($region !== null && trim($region) !== '') {
             $filters[] = [
-                'term' => [
-                    'region' => $region,
+                'wildcard' => [
+                    'region_search' => '*' . mb_strtolower(trim($region)) . '*',
                 ],
             ];
         }
 
-        if ($product !== null && $product !== '') {
+        if ($product !== null && trim($product) !== '') {
             $filters[] = [
                 'wildcard' => [
-                    'product' => '*' . mb_strtolower($product) . '*',
+                    'product_search' => '*' . mb_strtolower(trim($product)) . '*',
                 ],
             ];
         }
@@ -69,12 +69,18 @@ final class SalesReportService
 
         $baseUrl = rtrim((string)Yii::$app->params['elasticUrl'], '/');
 
-        $response = new Client([
+        $response = (new Client([
             'transport' => 'yii\httpclient\CurlTransport',
-        ])
-            ->post("{$baseUrl}/" . self::INDEX . '/_search', $query)
+        ]))
+            ->createRequest()
+            ->setMethod('POST')
+            ->setUrl("{$baseUrl}/" . self::INDEX . '/_search')
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->setContent(json_encode($query, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR))
             ->send();
-
         if (!$response->isOk) {
             throw new \RuntimeException('Report query failed: ' . $response->content);
         }

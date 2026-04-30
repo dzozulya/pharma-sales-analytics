@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace app\services;
 
 use Yii;
+use yii\helpers\VarDumper;
 use yii\httpclient\Client;
 use yii\mongodb\Connection;
 
@@ -22,7 +23,10 @@ final class ElasticTransferService
         $this->createIndexIfMissing();
 
         $collection = $this->mongo()->getCollection('badm_sales_raw');
-        $cursor = $collection->find([], ['batchSize' => $batchSize]);
+
+        $cursor = $collection->find([], [], [
+            'batchSize' => $batchSize,
+        ]);
 
         $processed = 0;
         $indexed = 0;
@@ -40,9 +44,9 @@ final class ElasticTransferService
                     '_index' => self::INDEX,
                     '_id' => $source['import_key'],
                 ],
-            ], JSON_UNESCAPED_UNICODE);
+            ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
-            $bulk[] = json_encode($source, JSON_UNESCAPED_UNICODE);
+            $bulk[] = json_encode($source, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 
             $processed++;
 
@@ -61,14 +65,15 @@ final class ElasticTransferService
             'indexed' => $indexed,
         ];
     }
-
     private function createIndexIfMissing(): void
     {
         $baseUrl = rtrim((string)Yii::$app->params['elasticUrl'], '/');
         $client = $this->httpClient();
 
         $exists = $client
-            ->head("{$baseUrl}/" . self::INDEX)
+            ->createRequest()
+            ->setMethod('HEAD')
+            ->setUrl("{$baseUrl}/" . self::INDEX)
             ->send();
 
         if ($exists->isOk) {
@@ -84,8 +89,10 @@ final class ElasticTransferService
                 'properties' => [
                     'import_key' => ['type' => 'keyword'],
                     'region' => ['type' => 'keyword'],
+                    'region_search' => ['type' => 'keyword'],
                     'city' => ['type' => 'keyword'],
                     'product' => ['type' => 'keyword'],
+                    'product_search' => ['type' => 'keyword'],
                     'product_code' => ['type' => 'keyword'],
                     'quantity' => ['type' => 'integer'],
                 ],
@@ -93,7 +100,14 @@ final class ElasticTransferService
         ];
 
         $response = $client
-            ->put("{$baseUrl}/" . self::INDEX, $mapping)
+            ->createRequest()
+            ->setMethod('PUT')
+            ->setUrl("{$baseUrl}/" . self::INDEX)
+            ->setHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ])
+            ->setContent(json_encode($mapping, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR))
             ->send();
 
         if (!$response->isOk) {
@@ -107,10 +121,14 @@ final class ElasticTransferService
         $body = implode("\n", $bulk) . "\n";
 
         $response = $this->httpClient()
-            ->post("{$baseUrl}/_bulk", $body)
-            ->addHeaders([
+            ->createRequest()
+            ->setMethod('POST')
+            ->setUrl("{$baseUrl}/_bulk")
+            ->setHeaders([
                 'Content-Type' => 'application/x-ndjson',
+                'Accept' => 'application/json',
             ])
+            ->setContent($body)
             ->send();
 
         if (!$response->isOk) {

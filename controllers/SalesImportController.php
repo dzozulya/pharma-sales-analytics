@@ -47,7 +47,7 @@ final class SalesImportController extends Controller
             ];
         }
 
-        $uploadDir = Yii::getAlias('@runtime/imports');
+        $uploadDir = Yii::getAlias('@app/storage/imports');
 
         FileHelper::createDirectory($uploadDir);
 

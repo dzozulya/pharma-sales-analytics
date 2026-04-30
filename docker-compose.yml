@@ -7,6 +7,7 @@ services:
     working_dir: /app
     volumes:
       - ./:/app
+      - ./docker/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
     environment:
       MONGODB_DSN: mongodb://mongodb:27017/datamind_test
       ELASTIC_URL: http://opensearch:9200

@@ -136,7 +136,10 @@
             success: function (response) {
                 if (response.success) {
                     showResult('success', response.message, response.result);
-                    $reportButton.show();
+
+                    $reportButton
+                        .hide()
+                        .fadeIn(250);
                 } else {
                     showResult('error', response.message || 'Transfer failed.', null);
                     $transferButton.prop('disabled', false);

@@ -51,16 +51,20 @@ final class CsvRowNormalizer
 
     public function normalizeForElastic(array $mongoDocument): array
     {
+        $product = (string)($mongoDocument[self::COL_PRODUCT] ?? '');
+        $region = (string)($mongoDocument[self::COL_REGION] ?? '');
+
         return [
             'import_key' => (string)($mongoDocument['import_key'] ?? ''),
-            'region' => (string)($mongoDocument[self::COL_REGION] ?? ''),
+            'region' => $region,
+            'region_search' => mb_strtolower($region),
             'city' => (string)($mongoDocument[self::COL_CITY] ?? ''),
-            'product' => (string)($mongoDocument[self::COL_PRODUCT] ?? ''),
+            'product' => $product,
+            'product_search' => mb_strtolower($product),
             'product_code' => (string)($mongoDocument[self::COL_PRODUCT_CODE] ?? ''),
             'quantity' => $this->toInt($mongoDocument[self::COL_QTY] ?? $mongoDocument['quantity'] ?? 0),
         ];
     }
-
     private function normalizeHeader(string $header): string
     {
         return trim(preg_replace('/\x{FEFF}/u', '', $header) ?? $header);

@@ -20,7 +20,7 @@ final class CsvUploadForm extends Model
                 'skipOnEmpty' => false,
                 'extensions' => ['csv'],
                 'checkExtensionByMimeType' => false,
-                'maxSize' => 20 * 1024 * 1024,
+                'maxSize' => 50 * 1024 * 1024,
             ],
         ];
     }
